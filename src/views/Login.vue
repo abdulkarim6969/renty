@@ -3,6 +3,11 @@
     <div class="login-box">
       <h1>Login to Your Account</h1>
 
+      <!-- Error message -->
+      <div v-if="errorMsg" class="error" role="alert">
+        {{ errorMsg }}
+      </div>
+
       <form @submit.prevent="handleLogin" class="login-form">
         <input type="email" v-model="email" placeholder="Email" required />
         <input type="password" v-model="password" placeholder="Password" required />
@@ -26,9 +31,11 @@
 
 <script setup>
 import { ref } from 'vue';
-import api from '@/services/api';       // adjust path if needed
-// import router from '@/router';           // if you want to navigate on success
+import { useRouter } from 'vue-router';
+import api from '@/services/api';
 
+
+const router = useRouter();
 const email = ref('');
 const password = ref('');
 const errorMsg = ref('');
@@ -36,21 +43,32 @@ const errorMsg = ref('');
 const handleLogin = async () => {
   errorMsg.value = '';
   try {
-    const response = await api.post('/auth/login', {
+    const response = await api.post('/api/auth/login', {
       email: email.value,
       password: password.value,
     });
-    const { token } = response.data;
+    const { token, tokenType } = response.data;
+
     // store JWT
-    localStorage.setItem('jwtToken', token);
-    // redirect to dashboard (or home)
-    // router.push({ name: 'Home' });
+    localStorage.setItem('token', token);
+    localStorage.setItem('tokenType', tokenType);
+    // redirect to homepage on success
+    await router.push({ name: 'HomePage' });
+    console.log("Redirected ");
+    
+    
   } catch (err) {
-    // Axios wraps errors—this handles network vs. 4xx/5xx
+    console.log(err);
+    
     if (err.response) {
-      errorMsg.value = err.response.data.message || 'Invalid credentials';
+      // Display server-sent message or fallback
+      errorMsg.value = err.response.data.message || 'Invalid email or password.';
+    } else if (err.request) {
+      // No response received
+      errorMsg.value = 'Network error. Please check your connection.';
     } else {
-      errorMsg.value = 'Network error, try again later';
+      // Other errors
+      errorMsg.value = 'An unexpected error occurred.';
     }
   }
 };
@@ -63,8 +81,8 @@ const loginWithGithub = () => {
   window.location.href = 'http://localhost:8080/oauth2/authorization/github';
 };
 </script>
-<style scoped >
 
+<style scoped>
 html, body, #app {
   margin: 0;
   padding: 0;
@@ -78,17 +96,15 @@ html, body, #app {
   font-size: 14px;
 }
 
-
 .login-container {
-  position: fixed;    /* pin it to the viewport */
+  position: fixed;
   top: 0; left: 0;
-  width: 100vw;       /* span full width */
-  height: 100vh;      /* span full height */
+  width: 100vw;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: #f7f7f7;
-  /* remove any leftover padding/margin from parent */
   box-sizing: border-box;
 }
 
