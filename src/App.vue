@@ -1,20 +1,17 @@
 <script setup>
-import HomePage from './views/HomePage.vue';
 import Login from './views/Login.vue';
-HomePage
+import { watch } from 'vue';
+import { useRoute } from 'vue-router';
+const route = useRoute();
+watch(route, (to) => {
+  console.log('Route changed to:', to.fullPath);
+});
 </script>
 
 <template>
-  <Login />
-  <!-- <HomePage /> -->
+  <router-view />
 </template>
 
 <style>
-  /* html, body, #app {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  width: 100%;
-} */
-
+ 
 </style>

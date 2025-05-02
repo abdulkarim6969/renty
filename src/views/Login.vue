@@ -35,6 +35,7 @@ import { useRouter } from 'vue-router';
 import api from '@/services/api';
 
 
+
 const router = useRouter();
 const email = ref('');
 const password = ref('');
@@ -53,7 +54,7 @@ const handleLogin = async () => {
     localStorage.setItem('token', token);
     localStorage.setItem('tokenType', tokenType);
     // redirect to homepage on success
-    await router.push({ name: 'HomePage' });
+    await router.push({ name: 'home' });
     console.log("Redirected ");
     
     
