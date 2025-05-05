@@ -2,14 +2,13 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080/', // adjust to your backend
+  baseURL: 'http://localhost:8080/', 
   timeout: 5000,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Request interceptor: automatically add the token if available
 api.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
   const tokenType = localStorage.getItem('tokenType') || 'Bearer'; // Default to Bearer if not saved separately

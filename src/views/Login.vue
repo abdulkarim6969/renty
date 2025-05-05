@@ -54,7 +54,7 @@ const handleLogin = async () => {
     localStorage.setItem('token', token);
     localStorage.setItem('tokenType', tokenType);
     // redirect to homepage on success
-    await router.push({ name: 'home' });
+    await router.push({ name: 'nuovOggetto' });
     console.log("Redirected ");
     
     
