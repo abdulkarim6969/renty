@@ -6,7 +6,7 @@
       <input v-model="form.nome" placeholder="Nome" class="input" required />
       <input v-model="form.descrizione" placeholder="Descrizione" class="input" required />
       <input type="number" v-model.number="form.prezzoGiornaliero" placeholder="Prezzo Giornaliero" class="input" required />
-      <input v-model="form.emailProprietario" placeholder="Email Proprietario" class="input" required />
+      <!-- Rimosso input email, l'email viene presa da localStorage -->
       <input v-model="form.nomeCategoria" placeholder="Categoria" class="input" required />
       
       <input type="file" @change="handleFileChange" accept="image/*" class="input" required />
@@ -27,7 +27,6 @@ const form = ref({
   nome: '',
   descrizione: '',
   prezzoGiornaliero: 0,
-  emailProprietario: '',
   nomeCategoria: '',
 })
 
@@ -40,25 +39,40 @@ function handleFileChange(e) {
 }
 
 async function submitForm() {
-  const formData = new FormData();
-  formData.append('file', selectedFile.value);
-  formData.append('dati', new Blob([JSON.stringify(form.value)], { type: 'application/json' }));
+  // Recupera l'email del proprietario da localStorage
+  const ownerEmail = localStorage.getItem('emailUtente')
+  if (!ownerEmail) {
+    error.value = true
+    console.error('Email proprietario non trovata in localStorage')
+    return
+  }
 
-  await api.get('/api/oggetti/4/immagine');
+  // Crea payload unendo form e email proprietario
+  const payload = {
+    ...form.value,
+    emailProprietario: ownerEmail,
+  }
 
-  // try {
-  //   await api.post('/api/oggetti', formData, {
-  //     headers: {
-  //       'Content-Type': 'multipart/form-data',
-  //     },
-  //   });
-  //   success.value = true;
-  //   error.value = false;
-  // } catch (err) {
-  //   success.value = false;
-  //   error.value = true;
-  //   console.error(err);
-  // }
+  const formData = new FormData()
+  formData.append('file', selectedFile.value)
+  formData.append(
+    'dati',
+    new Blob([JSON.stringify(payload)], { type: 'application/json' })
+  )
+
+  try {
+    await api.post('/api/oggetti', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+    success.value = true
+    error.value = false
+  } catch (err) {
+    success.value = false
+    error.value = true
+    console.error(err)
+  }
 }
 </script>
 

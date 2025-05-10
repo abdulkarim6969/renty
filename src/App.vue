@@ -1,5 +1,4 @@
 <script setup>
-import Login from './views/Login.vue';
 import { watch } from 'vue';
 import { useRoute } from 'vue-router';
 const route = useRoute();

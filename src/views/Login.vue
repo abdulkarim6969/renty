@@ -43,35 +43,40 @@ const errorMsg = ref('');
 
 const handleLogin = async () => {
   errorMsg.value = '';
+
+  let loginData;
   try {
     const response = await api.post('/api/auth/login', {
-      email: email.value,
+      email:    email.value,
       password: password.value,
     });
-    const { token, tokenType } = response.data;
+    loginData = response.data;
 
-    // store JWT
-    localStorage.setItem('token', token);
-    localStorage.setItem('tokenType', tokenType);
-    // redirect to homepage on success
-    await router.push({ name: 'nuovOggetto' });
-    console.log("Redirected ");
-    
-    
   } catch (err) {
-    console.log(err);
-    
+    console.error(err);
     if (err.response) {
-      // Display server-sent message or fallback
-      errorMsg.value = err.response.data.message || 'Invalid email or password.';
+      errorMsg.value = err.response.data.message || 'Email o password non validi.';
     } else if (err.request) {
-      // No response received
-      errorMsg.value = 'Network error. Please check your connection.';
+      errorMsg.value = 'Errore di rete. Controlla la connessione.';
     } else {
-      // Other errors
-      errorMsg.value = 'An unexpected error occurred.';
+      errorMsg.value = 'Errore inaspettato.';
     }
+    return;  // esci, senza proseguire
   }
+
+  // Se arrivi qui, la chiamata ha avuto successo:
+  const { token, tokenType } = loginData;
+
+  // 1. salva JWT
+  localStorage.setItem('token', token);
+  localStorage.setItem('tokenType', tokenType);
+
+  // 2. salva l'email del proprietario per le future chiamate
+  localStorage.setItem('emailUtente', email.value);
+
+  // 3. redirect
+  await router.push({ name: 'dettagliOggetto' });
+
 };
 
 const loginWithGoogle = () => {

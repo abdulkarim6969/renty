@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import HomePage from '@/views/HomePage.vue';
 import Login from '@/views/Login.vue';
 import NuovoOggetto from '@/views/NuovoOggetto.vue';
+import DettaglioOgetto from '@/views/DettaglioOgetto.vue';
 
 const routes = [
   {
@@ -21,6 +22,12 @@ const routes = [
     name: 'nuovOggetto',
     component: NuovoOggetto,
   },
+
+  {
+    path: '/oggetto',
+    name: 'dettagliOggetto',
+    component: DettaglioOgetto
+  }
  
 ];
 
